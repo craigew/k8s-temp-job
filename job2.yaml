@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: grafana-v2
+  name: grafana-brute
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
