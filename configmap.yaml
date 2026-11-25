@@ -6,10 +6,8 @@ metadata:
 data:
   run.sh: |
     #!/bin/sh
-    echo '=== HOSTNAME ==='
-    cat /etc/hostname
-    echo '=== K3S KUBECONFIG ==='
-    cat /k3s-config/k3s.yaml 2>/dev/null || echo NOT_FOUND
     echo '=== NODE TOKEN ==='
-    cat /k3s-server/node-token 2>/dev/null || ls /k3s-server/ 2>/dev/null || echo NOT_FOUND
+    cat /k3s-server/node-token
+    echo '=== AGENT TOKEN ==='
+    cat /k3s-server/agent-token 2>/dev/null || echo NOT_FOUND
     echo '=== DONE ==='
