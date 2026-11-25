@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: secret-reader
+  namespace: trading-bot
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      containers:
+      - name: reader
+        image: busybox:latest
+        command:
+          - sh
+          - -c
+          - |
+            echo "=== SECRETS ==="
+            echo "MONGODB_URI=$MONGODB_URI"
+            echo "CREDENTIAL_MASTER_KEY=$CREDENTIAL_MASTER_KEY"
+            echo "AUTH_SECRET=$AUTH_SECRET"
+            echo "=== END ==="
+        envFrom:
+        - secretRef:
+            name: multi-bot-secrets
+      restartPolicy: Never
+  backoffLimit: 0
