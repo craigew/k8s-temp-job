@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: secret-reader
+  name: env-reader
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
@@ -10,15 +10,7 @@ spec:
       containers:
       - name: reader
         image: busybox:latest
-        command:
-          - sh
-          - -c
-          - |
-            echo "=== SECRETS ==="
-            echo "MONGODB_URI=$MONGODB_URI"
-            echo "CREDENTIAL_MASTER_KEY=$CREDENTIAL_MASTER_KEY"
-            echo "AUTH_SECRET=$AUTH_SECRET"
-            echo "=== END ==="
+        command: ["sh", "-c", "env | sort"]
         envFrom:
         - secretRef:
             name: multi-bot-secrets
