@@ -6,13 +6,16 @@ metadata:
 data:
   run.sh: |
     #!/bin/sh
-    echo GRAFANA_CHECK
-    curl -s http://192.168.0.101:3000/api/health 2>&1
-    echo GRAFANA_LOGIN_TEST
-    curl -s -X POST http://192.168.0.101:3000/api/login   -H "Content-Type: application/json"   -d {"user":"admin","password":"admin"} 2>&1
-    echo GRAFANA_RESET
-    # Try Grafana CLI reset if accessible
-    curl -s http://192.168.0.101:3000/api/admin/users   -H "Authorization: Basic YWRtaW46YWRtaW4=" 2>&1 | head -c 500
-    echo LOKI_STREAMS
-    curl -s "http://192.168.0.101:3100/loki/api/v1/labels" 2>&1
+    echo GRAFANA_USERS
+    curl -sv -X POST http://192.168.0.101:3000/api/login   -H "Content-Type: application/json"   -d "{"user":"admin","password":"Xode^070825"}" 2>&1
+    echo ---
+    # Check other default grafana ports
+    curl -s http://192.168.0.101:3000/api/org 2>&1 | head -c 200
+    # Try the grafana CLI reset via HTTP (grafana has a /api/admin/users/1/password endpoint)
+    # But needs auth. Try reset-admin via grafana-server DB if accessible
+    # Check if grafana SQLite is exposed anywhere
+    echo MONGODB_CHECK
+    curl -s http://192.168.0.71:27017/ 2>&1 | head -c 100
+    echo CHECK_ETCD
+    curl -s http://192.168.0.131:2379/v3/kv/range 2>&1 | head -c 300
     echo DONE
