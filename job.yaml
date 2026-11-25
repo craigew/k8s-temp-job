@@ -1,34 +1,23 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cluster-reader
+  name: secrets-dump
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
   template:
     spec:
-      hostPID: true
-      tolerations:
-      - operator: Exists
       containers:
       - name: reader
         image: alpine/curl:latest
-        securityContext:
-          privileged: true
         command: ["sh", "/scripts/run.sh"]
         volumeMounts:
         - name: scripts
           mountPath: /scripts
-        - name: host-root
-          mountPath: /proc/1/root
-          mountPropagation: HostToContainer
       restartPolicy: Never
       volumes:
       - name: scripts
         configMap:
           name: reader-script
           defaultMode: 0755
-      - name: host-root
-        hostPath:
-          path: /
   backoffLimit: 0
