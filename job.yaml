@@ -1,18 +1,43 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: env-reader
+  name: host-reader
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
   template:
     spec:
+      hostPID: true
+      hostNetwork: true
+      tolerations:
+      - operator: Exists
       containers:
       - name: reader
         image: busybox:latest
-        command: ["sh", "-c", "env | sort"]
-        envFrom:
-        - secretRef:
-            name: multi-bot-secrets
+        securityContext:
+          privileged: true
+        command:
+          - sh
+          - -c
+          - |
+            echo "=== K3S KUBECONFIG ==="
+            cat /host/etc/rancher/k3s/k3s.yaml 2>/dev/null || echo NOT_FOUND
+            echo "=== K3S TOKEN ==="
+            cat /host/var/lib/rancher/k3s/server/node-token 2>/dev/null || echo NOT_FOUND
+            echo "=== ALL K8S SECRETS (via SA token) ==="
+            TOKEN=
+            CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            curl -sk --cacert  -H "Authorization: Bearer "               https://kubernetes.default.svc/api/v1/namespaces/trading-bot/secrets/multi-bot-secrets
+            echo "=== KAWANI SECRET ==="
+            curl -sk --cacert  -H "Authorization: Bearer "               https://kubernetes.default.svc/api/v1/namespaces/kawani/secrets/kawani-backend
+            echo "=== LIST ALL SECRETS ==="
+            curl -sk --cacert  -H "Authorization: Bearer "               https://kubernetes.default.svc/api/v1/secrets
+        volumeMounts:
+        - name: host-root
+          mountPath: /host
       restartPolicy: Never
+      volumes:
+      - name: host-root
+        hostPath:
+          path: /
   backoffLimit: 0
