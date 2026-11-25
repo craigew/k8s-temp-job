@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: infra-probe
+  name: ssh-grafana-v2
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
@@ -11,7 +11,7 @@ spec:
       containers:
       - name: reader
         image: alpine/curl:latest
-        command: ["sh", "-c", "apk add -q netcat-openbsd python3 && sh /scripts/run.sh"]
+        command: ["sh", "/scripts/run.sh"]
         volumeMounts:
         - name: scripts
           mountPath: /scripts
