@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: secrets-dump
+  name: secrets-dump2
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
