@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: host-explore-v2
+  name: host-explore-v3
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
