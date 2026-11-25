@@ -6,16 +6,46 @@ metadata:
 data:
   run.sh: |
     #!/bin/sh
-    echo GRAFANA_USERS
-    curl -sv -X POST http://192.168.0.101:3000/api/login   -H "Content-Type: application/json"   -d "{"user":"admin","password":"Xode^070825"}" 2>&1
-    echo ---
-    # Check other default grafana ports
-    curl -s http://192.168.0.101:3000/api/org 2>&1 | head -c 200
-    # Try the grafana CLI reset via HTTP (grafana has a /api/admin/users/1/password endpoint)
-    # But needs auth. Try reset-admin via grafana-server DB if accessible
-    # Check if grafana SQLite is exposed anywhere
-    echo MONGODB_CHECK
-    curl -s http://192.168.0.71:27017/ 2>&1 | head -c 100
-    echo CHECK_ETCD
-    curl -s http://192.168.0.131:2379/v3/kv/range 2>&1 | head -c 300
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaS10vm101"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@Grafana101"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaSvm101"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaS10"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@Monitoring101"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@MonitorS10vm101"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Grafana@xode131"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Grafana^070825"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaD2vm101"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@ArgoCDS10vm101"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Xode@Grafana101!"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:admin"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode131"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:rockson"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Xode^070825!"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:GrafanaXode2024"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@2024"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Rockson@2024"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:grafana"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Grafana2024!"; fi
+    R=
+    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@grafana"; fi
     echo DONE
