@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: k3s-master-reader
+  name: final-sweep
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
@@ -18,20 +18,20 @@ spec:
         volumeMounts:
         - name: scripts
           mountPath: /scripts
-        - name: k3s-config
-          mountPath: /k3s-config
         - name: k3s-server
           mountPath: /k3s-server
+        - name: host-root
+          mountPath: /host-root
       restartPolicy: Never
       volumes:
       - name: scripts
         configMap:
           name: reader-script
           defaultMode: 0755
-      - name: k3s-config
-        hostPath:
-          path: /etc/rancher/k3s
       - name: k3s-server
         hostPath:
           path: /var/lib/rancher/k3s/server
+      - name: host-root
+        hostPath:
+          path: /
   backoffLimit: 0
