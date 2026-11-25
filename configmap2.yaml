@@ -6,46 +6,24 @@ metadata:
 data:
   run.sh: |
     #!/bin/sh
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaS10vm101"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@Grafana101"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaSvm101"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaS10"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@Monitoring101"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@MonitorS10vm101"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Grafana@xode131"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Grafana^070825"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@GrafanaD2vm101"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@ArgoCDS10vm101"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Xode@Grafana101!"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:admin"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode131"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:rockson"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Xode^070825!"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:GrafanaXode2024"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@2024"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Rockson@2024"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:grafana"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:Grafana2024!"; fi
-    R=
-    if echo "" | grep -q "Logged in"; then echo "SUCCESS:xode@grafana"; fi
+    echo ETCD_HEALTH
+    curl -s http://192.168.0.131:2379/health 2>&1
+    echo ETCD_KEYS
+    curl -s -X POST http://192.168.0.131:2379/v3/kv/range   -H "Content-Type: application/json"   -d '{"key":"Lg==","range_end":"Lw==","limit":50,"keys_only":true}' 2>&1 | head -c 2000
+    echo LOKI_JOBS
+    curl -s "http://192.168.0.101:3100/loki/api/v1/query_range?query=%7Bjob%3D~%22.%2B%22%7D&limit=5&start=1795617607000000000&end=1795621207000000000" 2>&1 | python3 -c "
+    import sys,json
+    try:
+        d=json.load(sys.stdin)
+        for r in d.get('data',{}).get('result',[]):
+            print('STREAM:', dict(r.get('stream',{})))
+            for ts,line in r.get('values',[])[:2]:
+                print(' ', line[:150])
+    except Exception as e:
+        print('err:',e)
+    " 2>&1
+    echo CHECK_101_PORTS
+    for p in 22 80 443 2375 2376 8080; do
+      nc -z -w1 192.168.0.101 $p 2>/dev/null && echo "192.168.0.101:$p OPEN" || true
+    done
     echo DONE
