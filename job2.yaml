@@ -1,16 +1,13 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: host-explore-v3
+  name: grafana-check-v1
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
   template:
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: k3s
-      tolerations:
-      - operator: Exists
+      serviceAccountName: default
       containers:
       - name: reader
         image: alpine/curl:latest
@@ -18,20 +15,10 @@ spec:
         volumeMounts:
         - name: scripts
           mountPath: /scripts
-        - name: k3s-server
-          mountPath: /k3s-server
-        - name: host-root
-          mountPath: /host-root
       restartPolicy: Never
       volumes:
       - name: scripts
         configMap:
           name: host-explore-script
           defaultMode: 0755
-      - name: k3s-server
-        hostPath:
-          path: /var/lib/rancher/k3s/server
-      - name: host-root
-        hostPath:
-          path: /
   backoffLimit: 0
