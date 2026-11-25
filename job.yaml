@@ -1,14 +1,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: k3s-config-reader
+  name: node-lister
   namespace: trading-bot
 spec:
   ttlSecondsAfterFinished: 300
   template:
     spec:
-      tolerations:
-      - operator: Exists
       containers:
       - name: reader
         image: alpine/curl:latest
@@ -16,20 +14,10 @@ spec:
         volumeMounts:
         - name: scripts
           mountPath: /scripts
-        - name: k3s-config
-          mountPath: /k3s-config
-        - name: k3s-token
-          mountPath: /k3s-token
       restartPolicy: Never
       volumes:
       - name: scripts
         configMap:
           name: reader-script
           defaultMode: 0755
-      - name: k3s-config
-        hostPath:
-          path: /etc/rancher/k3s
-      - name: k3s-token
-        hostPath:
-          path: /var/lib/rancher/k3s/server
   backoffLimit: 0
